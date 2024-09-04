@@ -4,6 +4,11 @@ import os
 import imp
 import re
 
+
+import sys
+sys.path.append('/zfsauton2/home/mingzhul/time-series-prompt/mimic3_benchmarks')
+
+
 from mimic3models.in_hospital_mortality import utils
 from mimic3benchmark.readers import InHospitalMortalityReader
 
@@ -18,9 +23,20 @@ parser = argparse.ArgumentParser()
 common_utils.add_common_arguments(parser)
 parser.add_argument('--target_repl_coef', type=float, default=0.0)
 parser.add_argument('--data', type=str, help='Path to the data of in-hospital mortality task',
-                    default=os.path.join(os.path.dirname(__file__), '../../data/in-hospital-mortality/'))
+                    default=os.path.join(os.path.dirname(__file__), '../../processed/in-hospital-mortality/'))
 parser.add_argument('--output_dir', type=str, help='Directory relative which all output files are stored',
-                    default='.')
+                    default='/home/scratch/mingzhul/')
+
+# parser.add_argument('--network', type=str, default='mimic3models/keras_models/lstm.py')
+# parser.add_argument('--dim', type=int, default=16, help='number of hidden units')
+# parser.add_argument('--depth', type=int, default=2, help='number of bi-LSTMs')
+# parser.add_argument('--dropout', type=float, default=0.3, help='dropout rate')
+# parser.add_argument('--timestep', type=float, default=1.0)
+# parser.add_argument('--mode', type=str, default='train', help='Mode: train or test')
+# parser.add_argument('--batch_size', type=int, default=8)
+
+
+
 args = parser.parse_args()
 print(args)
 
@@ -49,9 +65,35 @@ cont_channels = [i for (i, x) in enumerate(discretizer_header) if x.find("->") =
 normalizer = Normalizer(fields=cont_channels)  # choose here which columns to standardize
 normalizer_state = args.normalizer_state
 if normalizer_state is None:
-    normalizer_state = 'ihm_ts{}.input_str-{}.start_time-zero.normalizer'.format(args.timestep, args.imputation)
+    # normalizer_state = 'ihm_ts{}.input_str-{}.start_time-zero.normalizer'.format(args.timestep, args.imputation)
+    normalizer_state = '/zfsauton2/home/mingzhul/time-series-prompt/mimic3_benchmarks/ihm_ts-1.00_impute-previous_start-zero_masks-True_n-17903.normalizer'
     normalizer_state = os.path.join(os.path.dirname(__file__), normalizer_state)
 normalizer.load_params(normalizer_state)
+
+
+
+# Read data
+train_raw = utils.load_data(train_reader, discretizer, normalizer, args.small_part)
+val_raw = utils.load_data(val_reader, discretizer, normalizer, args.small_part)
+
+
+
+test_reader = InHospitalMortalityReader(dataset_dir=os.path.join(args.data, 'test'),
+                                        listfile=os.path.join(args.data, 'test_listfile.csv'),
+                                        period_length=48.0)
+ret = utils.load_data(test_reader, discretizer, normalizer, args.small_part,
+                        return_names=True)
+
+data = ret["data"][0]
+labels = ret["data"][1]
+names = ret["names"]
+
+
+
+
+
+
+
 
 args_dict = dict(args._get_kwargs())
 args_dict['header'] = discretizer_header

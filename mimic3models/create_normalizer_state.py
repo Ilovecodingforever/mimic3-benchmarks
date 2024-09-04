@@ -1,3 +1,8 @@
+import sys
+sys.path.append('/zfsauton2/home/mingzhul/time-series-prompt/mimic3_benchmarks')
+
+
+
 from mimic3benchmark.readers import InHospitalMortalityReader
 from mimic3benchmark.readers import DecompensationReader
 from mimic3benchmark.readers import LengthOfStayReader
@@ -14,7 +19,9 @@ def main():
                                                  'means and standard deviations of columns of the output of a '
                                                  'discretizer, which are later used to standardize the input of '
                                                  'neural models.')
-    parser.add_argument('--task', type=str, required=True,
+    parser.add_argument('--task', type=str,
+                        # required=True,
+                        default='ihm',
                         choices=['ihm', 'decomp', 'los', 'pheno', 'multi'])
     parser.add_argument('--timestep', type=float, default=1.0,
                         help="Rate of the re-sampling to discretize time-series.")
@@ -22,6 +29,7 @@ def main():
                         choices=['zero', 'next', 'previous', 'normal_value'],
                         help='Strategy for imputing missing values.')
     parser.add_argument('--start_time', type=str, choices=['zero', 'relative'],
+                        default='zero',
                         help='Specifies the start time of discretization. Zero means to use the beginning of '
                              'the ICU stay. Relative means to use the time of the first ICU event')
     parser.add_argument('--store_masks', dest='store_masks', action='store_true',
@@ -32,7 +40,10 @@ def main():
                         'standard deviations. Set -1 to use all training samples.')
     parser.add_argument('--output_dir', type=str, help='Directory where the output file will be saved.',
                         default='.')
-    parser.add_argument('--data', type=str, required=True, help='Path to the task data.')
+    parser.add_argument('--data', type=str,
+                        # required=True,
+                        default=os.path.join(os.path.dirname(__file__), '../processed/in-hospital-mortality/'),
+                        help='Path to the task data.')
     parser.set_defaults(store_masks=True)
 
     args = parser.parse_args()
@@ -56,7 +67,9 @@ def main():
     discretizer = Discretizer(timestep=args.timestep,
                               store_masks=args.store_masks,
                               impute_strategy=args.impute_strategy,
-                              start_time=args.start_time)
+                              start_time=args.start_time,
+                            #   same_length=False
+                              )
     discretizer_header = reader.read_example(0)['header']
     continuous_channels = [i for (i, x) in enumerate(discretizer_header) if x.find("->") == -1]
 

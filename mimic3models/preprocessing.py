@@ -7,7 +7,11 @@ import os
 
 class Discretizer:
     def __init__(self, timestep=0.8, store_masks=True, impute_strategy='zero', start_time='zero',
-                 config_path=os.path.join(os.path.dirname(__file__), 'resources/discretizer_config.json')):
+                 config_path=os.path.join(os.path.dirname(__file__), 'resources/discretizer_config.json'),
+                 same_length=True):
+
+        if not same_length:
+            config_path = os.path.join(os.path.dirname(__file__), 'resources/discretizer_config_time.json')
 
         with open(config_path) as f:
             config = json.load(f)
@@ -16,8 +20,11 @@ class Discretizer:
             self._is_categorical_channel = config['is_categorical_channel']
             self._possible_values = config['possible_values']
             self._normal_values = config['normal_values']
+            self._same_length = same_length
 
-        self._header = ["Hours"] + self._id_to_channel
+        self._header = self._id_to_channel
+        if same_length:
+            self._header = ["Hours"] + self._id_to_channel
         self._timestep = timestep
         self._store_masks = store_masks
         self._start_time = start_time
@@ -51,8 +58,11 @@ class Discretizer:
         else:
             max_hours = end - first_time
 
-        N_bins = int(max_hours / self._timestep + 1.0 - eps)
-
+        if self._same_length:
+            N_bins = int(max_hours / self._timestep + 1.0 - eps)
+        else:
+            N_bins = len(X)
+        
         cur_len = 0
         begin_pos = [0 for i in range(N_channels)]
         end_pos = [0 for i in range(N_channels)]
@@ -83,14 +93,20 @@ class Discretizer:
             else:
                 data[bin_id, begin_pos[channel_id]] = float(value)
 
-        for row in X:
+        for row_num, row in enumerate(X):
             t = float(row[0]) - first_time
             if t > max_hours + eps:
                 continue
             bin_id = int(t / self._timestep - eps)
+            if not self._same_length:
+                bin_id = row_num
             assert 0 <= bin_id < N_bins
 
-            for j in range(1, len(row)):
+            start = 0
+            if self._same_length:
+                start = 1
+            # for j in range(1, len(row)):
+            for j in range(start, len(row)):
                 if row[j] == "":
                     continue
                 channel = header[j]
@@ -103,6 +119,7 @@ class Discretizer:
 
                 write(data, bin_id, channel, row[j], begin_pos)
                 original_value[bin_id][channel_id] = row[j]
+
 
         # impute missing values
 

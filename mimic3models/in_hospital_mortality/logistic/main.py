@@ -30,7 +30,7 @@ def main():
     parser.add_argument('--features', type=str, default='all', help='specifies what features to extract',
                         choices=['all', 'len', 'all_but_len'])
     parser.add_argument('--data', type=str, help='Path to the data of in-hospital mortality task',
-                        default=os.path.join(os.path.dirname(__file__), '../../../data/in-hospital-mortality/'))
+                        default=os.path.join(os.path.dirname(__file__), '../../../processed/in-hospital-mortality/'))
     parser.add_argument('--output_dir', type=str, help='Directory relative which all output files are stored',
                         default='.')
     args = parser.parse_args()
@@ -52,6 +52,26 @@ def main():
     (train_X, train_y, train_names) = read_and_extract_features(train_reader, args.period, args.features)
     (val_X, val_y, val_names) = read_and_extract_features(val_reader, args.period, args.features)
     (test_X, test_y, test_names) = read_and_extract_features(test_reader, args.period, args.features)
+
+
+
+
+    train_X = train_X[:400]
+    train_y = train_y[:400]
+    train_names = train_names[:400]
+    val_X = val_X[:400]
+    val_y = val_y[:400]
+    val_names = val_names[:400]
+    test_X = test_X[:400]
+    test_y = test_y[:400]
+    test_names = test_names[:400]
+    
+
+
+
+
+
+
     print('  train data shape = {}'.format(train_X.shape))
     print('  validation data shape = {}'.format(val_X.shape))
     print('  test data shape = {}'.format(test_X.shape))

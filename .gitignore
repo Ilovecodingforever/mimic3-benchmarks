@@ -1,3 +1,13 @@
+mimic3models/in_hospital_mortality/keras_logs/
+mimic3models/in_hospital_mortality/logistic/predictions/
+mimic3models/in_hospital_mortality/logistic/results/
+
+d.zip
+
+notimestamp_ihm_ts-1.00_impute-previous_start-zero_masks-True_n-17903.normalizer 
+processed/
+timestamp_ihm_ts-1.00_impute-previous_start-zero_masks-True_n-17903.normalizer
+
 # custom
 .idea
 miscellaneous

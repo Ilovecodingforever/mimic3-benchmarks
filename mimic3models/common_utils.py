@@ -69,7 +69,8 @@ def sort_and_shuffle(data, batch_size):
 def add_common_arguments(parser):
     """ Add all the parameters which are common across the tasks
     """
-    parser.add_argument('--network', type=str, required=True)
+    # parser.add_argument('--network', type=str, required=True)
+    parser.add_argument('--network', type=str, default='mimic3models/keras_models/lstm.py')
     parser.add_argument('--dim', type=int, default=256,
                         help='number of hidden units')
     parser.add_argument('--depth', type=int, default=1,
