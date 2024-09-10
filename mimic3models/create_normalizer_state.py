@@ -21,7 +21,8 @@ def main():
                                                  'neural models.')
     parser.add_argument('--task', type=str,
                         # required=True,
-                        default='ihm',
+                        # default='ihm',
+                        default='pheno',
                         choices=['ihm', 'decomp', 'los', 'pheno', 'multi'])
     parser.add_argument('--timestep', type=float, default=1.0,
                         help="Rate of the re-sampling to discretize time-series.")
@@ -42,7 +43,8 @@ def main():
                         default='.')
     parser.add_argument('--data', type=str,
                         # required=True,
-                        default=os.path.join(os.path.dirname(__file__), '../processed/in-hospital-mortality/'),
+                        # default=os.path.join(os.path.dirname(__file__), '../processed/in-hospital-mortality/'),
+                        default=os.path.join(os.path.dirname(__file__), '../processed/phenotyping/'),
                         help='Path to the task data.')
     parser.set_defaults(store_masks=True)
 
@@ -68,7 +70,7 @@ def main():
                               store_masks=args.store_masks,
                               impute_strategy=args.impute_strategy,
                               start_time=args.start_time,
-                            #   same_length=False
+                              same_length=False
                               )
     discretizer_header = reader.read_example(0)['header']
     continuous_channels = [i for (i, x) in enumerate(discretizer_header) if x.find("->") == -1]
