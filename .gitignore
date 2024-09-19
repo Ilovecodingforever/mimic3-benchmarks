@@ -4,10 +4,8 @@ mimic3models/in_hospital_mortality/logistic/results/
 
 d.zip
 
-notimestamp_ihm_ts-1.00_impute-previous_start-zero_masks-True_n-17903.normalizer 
 processed/
-timestamp_ihm_ts-1.00_impute-previous_start-zero_masks-True_n-17903.normalizer
-timestamp_pheno_ts-1.00_impute-previous_start-zero_masks-True_n-35621.normalizer
+
 
 # custom
 .idea
