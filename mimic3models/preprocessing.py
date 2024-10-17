@@ -182,6 +182,10 @@ class Discretizer:
 
         new_header = ",".join(new_header)
 
+        # NOTE: use time delta. remember to rerun create_normalizer_state.py
+        # if self._same_length:
+        #     data[:, 0] = np.diff(np.concatenate([[0], data]))
+
         return (data, new_header)
 
     def print_statistics(self):

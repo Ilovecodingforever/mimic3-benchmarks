@@ -3,21 +3,17 @@ import numpy as np
 import os
 
 
-def load_data(reader, discretizer, normalizer, small_part=False, return_names=False):
-
-
-
-
-    # small_part = True
-
-
-
-
+def load_data(reader, discretizer, normalizer, small_part=False, return_names=False, load_size=None):
 
     N = reader.get_number_of_examples()
     if small_part:
         N = 1000
         # N = 4000   # 14681 in total
+
+    if load_size is not None:
+        N = load_size
+
+
     ret = common_utils.read_chunk(reader, N)
     data = ret["X"]
     ts = ret["t"]
